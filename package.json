@@ -1,0 +1,13 @@
+{
+  "name": "dependency-visualizer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Alexander Varwijk <alexander@goalgorilla.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "commander": "^2.14.1",
+    "dependency-graph": "^0.7.0",
+    "js-yaml": "^3.10.0"
+  }
+}
