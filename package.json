@@ -1,5 +1,5 @@
 {
-  "name": "dependency-visualizer",
+  "name": "drupal-dependency-deduplicator",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Alexander Varwijk <alexander@goalgorilla.com>",
