@@ -15,7 +15,7 @@ program
   .parse(process.argv);
 
 if (!program.args.length) {
-  console.error("Missing arguments, try `" + program.name() + " --help`");
+  console.error('Missing arguments, try `' + program.name() + ' --help`');
   process.exit(1);
 }
 
@@ -41,7 +41,7 @@ function fromDir(startPath, filter){
 
   // Check if the path exists
   if (!fs.existsSync(startPath)) {
-    console.error("No such directory: ",startPath);
+    console.error('No such directory: ',startPath);
     process.exit(1);
   }
 
@@ -63,17 +63,17 @@ function fromDir(startPath, filter){
 
 const modules = fromDir(baseDir, '.info.yml');
 
-console.log("Found", modules.length, "modules");
+console.log('Found', modules.length, 'modules');
 
 let loads = [];
 
-for (file of modules) {
+for (let file of modules) {
   const p = new Promise(function (resolve, reject) {
     const filename = file;
     fs.readFile(filename, (err, data) => {
       if (err) return reject(err);
       resolve([filename, data]);
-    })
+    });
   });
   loads.push(p);
 }
@@ -95,11 +95,11 @@ Promise.map(loads, (item) => {
   if (yml.dependencies) {
     for (let i in yml.dependencies) {
       // Split on the : in the name.
-      const split = yml.dependencies[i].split(":");
+      const split = yml.dependencies[i].split(':');
 
       // Take the last element of the array (works with and without :).
       // Then remove any possible version constraints.
-      yml.dependencies[i] = split[split.length - 1].split(" ")[0];
+      yml.dependencies[i] = split[split.length - 1].split(' ')[0];
     }
   }
 
@@ -128,7 +128,7 @@ Promise.map(loads, (item) => {
           // Some modules declare dependencies that may not be installed.
           // Ignore those but propagate other errors.
           if (e.message.indexOf('Node does not exist') === -1) {
-            console.log("Error for", name, dep);
+            console.log('Error for', name, dep);
             throw e;
           }
         }
@@ -137,12 +137,13 @@ Promise.map(loads, (item) => {
   }
 
   try {
-    const ordered_deps = graph.overallOrder().reverse();
+    // Fetch the overall order to trigger any cyclical dependencies.
+    graph.overallOrder();
   }
   catch (e) {
     // Handle the cyclical dependency error.
     if (e.message.indexOf('Dependency Cycle Found: ') !== -1) {
-      console.log("Found the following cyclical dependency:", e.message.split(": ")[1]);
+      console.log('Found the following cyclical dependency:', e.message.split(': ')[1]);
       process.exit();
     }
     throw e;
@@ -180,15 +181,15 @@ Promise.map(loads, (item) => {
     }
 
     if (duplicates.length) {
-      console.log("Found duplicate dependencies for", module);
-      console.log("duplicate".padding(30), "owner");
-      console.log("".padding(54, '-'));
+      console.log('Found duplicate dependencies for', module);
+      console.log('duplicate'.padding(30), 'owner');
+      console.log(''.padding(54, '-'));
       for (let relation of duplicates) {
         const [owner, duplicate] = relation;
         console.log(duplicate.padding(30), owner);
       }
-      console.log("".padding(54, '-'));
-      console.log("");
+      console.log(''.padding(54, '-'));
+      console.log('');
     }
   }
 
@@ -255,7 +256,7 @@ String.prototype.padding = function(n, c)
   }
   var m = Math.max((Math.abs(n) - this.length) || 0, 0);
   var pad = Array(m + 1).join(String(c || ' ').charAt(0));
-//      var pad = String(c || ' ').charAt(0).repeat(Math.abs(n) - this.length);
+  //      var pad = String(c || ' ').charAt(0).repeat(Math.abs(n) - this.length);
   return (n < 0) ? pad + val : val + pad;
 //      return (n < 0) ? val + pad : pad + val;
 };
