@@ -15,5 +15,8 @@
     "commander": "^2.14.1",
     "dependency-graph": "^0.7.0",
     "js-yaml": "^3.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0"
   }
 }
