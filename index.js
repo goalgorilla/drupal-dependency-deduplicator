@@ -63,7 +63,7 @@ function fromDir(startPath, filter){
 
 const modules = fromDir(baseDir, '.info.yml');
 
-console.log('Found', modules.length, 'modules');
+// console.log('Found', modules.length, 'modules');
 
 let loads = [];
 
@@ -138,7 +138,44 @@ Promise.map(loads, (item) => {
 
   try {
     // Fetch the overall order to trigger any cyclical dependencies.
-    graph.overallOrder();
+    const order = graph.overallOrder();
+    // Create a JSON matrix that can be used in d3.dependencywheel.js.
+    let data = {
+      packageNames: order,
+      matrix: [],
+    };
+    // This takes N^2 operations where N is the number of dependencies.
+    for (const origin of order) {
+      let dependencies = graph.dependenciesOf(origin);
+      // Add a row of dependencies for this module. If it depends on another
+      // module we put a 1 in this row, if not we put a 0.
+      data.matrix.push(
+        order.map(target => dependencies.includes(target) ? 1 : 0)
+      );
+    }
+    // Output everything as a HTML file that can be opened in the browser.
+    console.log(`
+<html>
+<head>
+  <meta charset="utf-8" /> 
+  <title>Dependency Graph</title>
+</head>
+<body>
+<script src="https://unpkg.com/d3-dependency-wheel@1.1.0/js/d3.min.js" type="text/javascript"></script>
+<script src="https://unpkg.com/d3-dependency-wheel@1.1.0/js/d3.dependencyWheel.js" type="text/javascript"></script>
+<div id="chart_placeholder"></div>
+<script type="text/javascript">
+  const data = ${JSON.stringify(data, null, 2)};
+  var chart = d3.chart.dependencyWheel()
+    .width(800);
+  d3.select('#chart_placeholder')
+    .datum(data)
+    .call(chart);
+</script>
+</body>
+</html>
+    `);
+    process.exit();
   }
   catch (e) {
     // Handle the cyclical dependency error.
