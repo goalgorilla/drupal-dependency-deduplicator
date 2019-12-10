@@ -138,7 +138,26 @@ Promise.map(loads, (item) => {
 
   try {
     // Fetch the overall order to trigger any cyclical dependencies.
-    graph.overallOrder();
+    const order = graph.overallOrder();
+    // Output Graphviz output. The order should start with things that have
+    // dependencies.
+    // TODO: When adding dependencies to the graph we currently ignore missing
+    //   dependencies, these are for example Drupal core modules. These are
+    //   important for the dependency overview because they could very well be
+    //   deduplicated.
+    for (const origin of order) {
+      const dependencies = graph.dependenciesOf(origin);
+      for (const target of dependencies) {
+        console.log(`"${origin}" -> "${target}"`);
+      }
+    }
+    // At the end print anything that doesn't have a dependency.
+    const leaves = graph.overallOrder(true);
+    for (const leave of leaves) {
+      console.log(`"${leave}"`);
+    }
+    console.log("");
+
   }
   catch (e) {
     // Handle the cyclical dependency error.
